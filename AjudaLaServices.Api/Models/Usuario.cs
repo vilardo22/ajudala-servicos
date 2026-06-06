@@ -8,6 +8,7 @@ namespace AjudaLaServices.Api.Models
 
         public string TipoPerfil {get; set; } = string.Empty;
 
+        public string WhatsApp { get; set; } = string.Empty;
         public int? CategoriaId {get; set; }
         public Categoria? Categoria {get; set; }
 

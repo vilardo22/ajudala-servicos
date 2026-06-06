@@ -1,0 +1,47 @@
+/* src/index.css */
+
+:root {
+  /* Paleta de Cores Oficial do Ajuda Lá */
+  --cor-primaria: #FF7622; /* Laranja da logo */
+  --cor-primaria-hover: #e66515;
+  --cor-secundaria: #181C2E; /* Azul escuro da logo */
+  --cor-fundo: #F5F7FA;
+  --cor-texto: #333333;
+  --cor-texto-claro: #7A7A7A;
+  --cor-branco: #FFFFFF;
+  --cor-borda: #E0E0E0;
+
+  /* Estilos de borda e sombra baseados no PDF */
+  --borda-arredondada: 12px;
+  --sombra-leve: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Estilo global para botões (baseado no botão laranja do PDF) */
+.btn-primario {
+  background-color: var(--cor-primaria);
+  color: var(--cor-branco);
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--borda-arredondada);
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%;
+}
+
+.btn-primario:hover {
+  background-color: var(--cor-primaria-hover);
+}
