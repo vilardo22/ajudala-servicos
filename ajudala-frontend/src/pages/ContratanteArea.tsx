@@ -68,20 +68,24 @@ export default function ContratanteArea() {
     };
 
     try {
-      // 1. Grava no SQLite através da API C#
+      // 1. Tenta gravar no SQLite através da API C#
       await api.post('/agendamentos', novoAgendamento);
       
-      // 2. Monta o link do WhatsApp
+      // 2. Só executa os passos abaixo se o C# disser "OK" e salvar no banco
       const numeroLimpo = prestador.whatsApp.replace(/\D/g, '');
       const texto = `Olá ${prestador.nome}, meu nome é ${contratanteNome}. Solicitei um serviço de ${categoriaSelecionada?.nome} pelo Ajuda Lá para o dia ${new Date(dataHora).toLocaleString('pt-BR')}!`;
       
-      // 3. Abre o WhatsApp numa nova aba
       window.open(`https://wa.me/55${numeroLimpo}?text=${encodeURIComponent(texto)}`, '_blank');
-      
       alert('Agendamento registrado! Entre em contato com o profissional.');
-    } catch (erro) {
-      console.error("Erro ao processar agendamento", erro);
-      alert('Erro ao registrar o agendamento no sistema.');
+      
+    } catch (erro: any) {
+      // Se o C# devolver o erro 400 que acabamos de criar, pegamos a mensagem exata
+      if (erro.response && erro.response.status === 400) {
+        alert(erro.response.data.mensagem);
+      } else {
+        console.error("Erro ao processar agendamento", erro);
+        alert('Erro ao registrar o agendamento no sistema. Tente novamente.');
+      }
     }
   };
 
@@ -144,9 +148,9 @@ export default function ContratanteArea() {
                   <button 
                     onClick={() => handleSolicitarServico(prestador)}
                     className="btn-primaria" 
-                    style={{ backgroundColor: '#25D366', width: 'auto' }}
+                    style={{ backgroundColor: '#25D366', width: 'auto', borderRadius: 'var(--borda-arredondada)',fontWeight: 'bold', color:'white'}}
                   >
-                    Chamar no WhatsApp
+                    Agendar e Chamar no WhatsApp
                   </button>
                 </div>
               ))}

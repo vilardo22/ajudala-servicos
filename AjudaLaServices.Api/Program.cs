@@ -73,16 +73,30 @@ app.MapGet("/api/usuarios", async (AppDbContext db) =>
 // ==========================================
 
 // 1. Criar um novo agendamento (O que o Contratante faz)
-app.MapPost("/api/agendamentos", async (AppDbContext db, Agendamento agendamento) =>
+// Criar novo agendamento com validação de conflito de horário
+app.MapPost("/api/agendamentos", async (Agendamento novoAgendamento, AppDbContext db) =>
 {
-    // Forçamos o status inicial por segurança
-    agendamento.Status = "Pendente"; 
-    
-    db.Agendamentos.Add(agendamento);
-    await db.SaveChangesAsync();
-    return Results.Created($"/api/agendamentos/{agendamento.Id}", agendamento);
-});
+    // 1. Define a "janela de bloqueio" (1 hora antes até 1 hora depois do horário solicitado)
+    DateTime limiteInferior = novoAgendamento.Datahora.AddHours(-1);
+    DateTime limiteSuperior = novoAgendamento.Datahora.AddHours(1);
 
+    // 2. Busca se existe algum agendamento que caia DENTRO dessa janela
+    bool horarioOcupado = await db.Agendamentos.AnyAsync(a => 
+        a.PrestadorId == novoAgendamento.PrestadorId && 
+        a.Status != "Recusado" &&
+        a.Datahora > limiteInferior && 
+        a.Datahora < limiteSuperior);
+
+    if (horarioOcupado)
+    {
+        return Results.BadRequest(new { mensagem = "O profissional já possui um serviço neste intervalo. Por favor, escolha um horário com pelo menos 1 hora de diferença." });
+    }
+
+    db.Agendamentos.Add(novoAgendamento);
+    await db.SaveChangesAsync();
+
+    return Results.Created($"/api/agendamentos/{novoAgendamento.Id}", novoAgendamento);
+});
 // 2. Listar os agendamentos de um Prestador específico (Para a tela do Prestador)
 app.MapGet("/api/agendamentos/prestador/{prestadorId}", async (int prestadorId, AppDbContext db) =>
 {
